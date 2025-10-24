@@ -25,8 +25,8 @@ const frog = {
   },
   // The frog's tongue has a position, size, speed, and state
   tongue: {
-    x: 480,
-    y: undefined,
+    x: undefined,
+    y: 480,
     size: 20,
     speed: 20,
     // Determines how the tongue moves each frame

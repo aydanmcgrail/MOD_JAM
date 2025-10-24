@@ -6,7 +6,7 @@ let fly3 = undefined;
 let fly4 = undefined;
 
 let FrogDelayY = 0;
-let easing = 0.004;
+let easing = 0.008;
 
 const frog = {
   // The frog's body has a position and size
@@ -19,8 +19,8 @@ const frog = {
   tongue: {
     x: 1600,
     y: undefined,
-    size: 20,
-    speed: 20,
+    size: 60,
+    speed: 5,
     // Determines how the tongue moves each frame
     state: "idle", // State can be: idle, outbound, inbound
   },
@@ -57,6 +57,8 @@ function draw() {
   //move the tongue
   moveTongue();
   moveFrog();
+  keyReleased();
+  //     pressingMouse();
 
   //draw the flies
   drawFly(fly1);
@@ -102,29 +104,41 @@ function drawFly(fly) {
   pop();
 }
 
+function keyReleased() {
+  if (keyCode === LEFT_ARROW) {
+    frog.tongue.x += frog.tongue.speed;
+  }
+}
+
 function moveTongue() {
   // Tongue matches the frog's x
   frog.tongue.y = frog.body.y;
-  // If the tongue is idle, it doesn't do anything
+  //if user presses the space key the tongue moves left
+  if (keyIsDown(LEFT_ARROW)) {
+    frog.tongue.x += -frog.tongue.speed;
+  }
+  /**  If the tongue is idle, it doesn't do anything
   if (frog.tongue.state === "idle") {
     // Do nothing
   }
-  // If the tongue is outbound, it moves up
+  // If the tongue is outbound, it moves left
   else if (frog.tongue.state === "outbound") {
-    frog.tongue.y += -frog.tongue.speed;
-    // The tongue bounces back if it hits the top
-    if (frog.tongue.y <= 0) {
+    //it starts at 1600 so substracting makes it go left.
+    frog.tongue.x += -frog.tongue.speed;
+    // The tongue bounces back if it hits the left(value=0)
+    if (mouseReleased()) {
       frog.tongue.state = "inbound";
     }
   }
-  // If the tongue is inbound, it moves down
+  // If the tongue is inbound, it moves back to the right origin (1600px)
   else if (frog.tongue.state === "inbound") {
-    frog.tongue.y += frog.tongue.speed;
+    frog.tongue.x += frog.tongue.speed;
     // The tongue stops if it hits the bottom
-    if (frog.tongue.y >= height) {
+    if (frog.tongue.x >= width) {
       frog.tongue.state = "idle";
     }
   }
+  */
 }
 
 function moveFrog() {
@@ -137,14 +151,14 @@ function moveFrog() {
 function drawFrog() {
   // Draw the tongue tip
   push();
-  fill("#ff0000");
+  fill("#693e3eff");
   noStroke();
   ellipse(frog.tongue.x, frog.tongue.y, frog.tongue.size);
   pop();
 
   // Draw the rest of the tongue
   push();
-  stroke("#ff0000");
+  stroke("#693e3eff");
   strokeWeight(frog.tongue.size);
   line(frog.tongue.x, frog.tongue.y, frog.body.x, frog.body.y);
   pop();
@@ -175,9 +189,12 @@ function checkTongueFlyOverlap() {
 
 /**
  * Launch the tongue on click (if it's not launched yet)
- */
-function mousePressed() {
-  if (frog.tongue.state === "idle") {
+ 
+function pressingMouse() {
+  if (mouseIsPressed) {
     frog.tongue.state = "outbound";
+  } else {
+    frog.tongue.state === "inbound";
   }
 }
+*/
