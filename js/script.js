@@ -5,16 +5,21 @@ let fly2 = undefined;
 let fly3 = undefined;
 let fly4 = undefined;
 
-let easing = 0.004;
+let easing = 0.04;
 let easing2 = 0.004;
 
-let tongueX;
-let targetX;
+let tongueX = 1570;
+let targetX = 1570;
 let min;
 let max;
 let click = 0;
 
-let wobbly = 1; //if wobbly= like over 100/extend too far then the tongue will go up and down.
+let life = 100; ///will be its hp 0 means the tongue will break.
+let wobbly = 100; //if wobbly= like over 100/extend too far then the tongue will go up and down.
+let moving = false;
+let wobble = 1;
+let wobbleTimer = 0; //each amount of set seconds will trigger opposite direction
+let wobbleLoop;
 
 const frog = {
   // The frog's body has a position and size
@@ -27,22 +32,24 @@ const frog = {
   tongue: {
     x: undefined,
     easeX: undefined,
-    y: undefined,
-    size: 60,
+    y: 400,
+    size: 80,
     speed: 10,
+    velocity: 10,
     // Determines how the tongue moves each frame
     state: "idle", // State can be: idle, outbound, inbound
-    life: 100, ///will be its hp 0 means the tongue will break.
   },
 };
 
 function setup() {
   createCanvas(1600, 900);
 
-  tongueX = 1580;
-  targetX = 1580;
+  frameRate(50); // i think a lower framerate will be all around better
+
+  tongueX = 1570;
+  targetX = 1570;
   min = 50;
-  max = 15800;
+  max = 1580;
 
   fly1 = createFly();
   fly2 = createFly();
@@ -65,7 +72,9 @@ function draw() {
   background("#87ceeb");
 
   //checkLife();
-  text(click, width / 4, height / 4);
+  text(life, width / 4, height / 4);
+  text(wobbleTimer, width / 4.5, height / 4.5);
+  text(wobbleLoop, width / 4.75, height / 4.75);
 
   moveFly(fly1);
   moveFly(fly2);
@@ -125,28 +134,49 @@ function drawFly(fly) {
 
 function moveTongue() {
   // Tongue matches the frog's y
-  frog.tongue.y = frog.body.y;
+  //frog.tongue.y = frog.body.y;
 
   if (keyIsPressed) {
     if (keyCode === 65) {
-      targetX -= 4;
+      targetX -= 5;
     } else if (keyCode === 68) {
-      targetX += 4;
+      targetX += 5;
     }
   }
-  targetX = targetX + 1;
+  targetX = targetX + 2;
   targetX = constrain(targetX, min, max);
 
   tongueX += (targetX - tongueX) * easing;
 }
 
 function wobbleTongue() {
-  if (tongueX <= 1000) {
-    wobbly += 2;
-    if (wobbly >= 100) {
-      frog.tongue.y += frog.tongue.speed;
-    }
+  //do not know how but this works. this can be a another to solve my problem
+  // of wanting the tongue to move up and down past a certain widht
+  //frog.tongue.y = mouseY;
+  //but that is not the way i wanted it to be. i want it to move by istelf out
+  //of the sheer weight of the longue stone tongue.
+
+  /*let cycleLength = 100;
+  let rawValue = frameCount % cycleLength;
+
+  loopValue = rawValue / (cycleLength - 1);
+*/
+
+  //frog.tongue.y = frog.body.y;
+  //trigger an event when the tongue is extended too far
+  if (tongueX <= 1300) {
+    life -= 0.025; //this make somwehat of a second (minus one second)
+    moving = !moving;
+    wobbleTimer += 0.025;
+  } else {
+    frog.tongue.y = frog.body.y;
+    wobbleTimer = 0;
   }
+  if (moving) {
+    frog.tongue.y += wobbleTimer;
+  }
+
+  //if(frog.tongue.y )
 }
 
 function moveFrog() {
