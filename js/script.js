@@ -66,8 +66,8 @@ function createFly() {
     x: random(150, 800),
     y: random(150, 700),
     size: 20,
-    speedX: 10,
-    speedY: 10,
+    speedX: 4,
+    speedY: 4,
     velocity: { x: 0, y: 0 }
   };
   return fly;
@@ -116,11 +116,27 @@ function moveFly(fly) {
   if (frameCount % 50 === 0) {
     fly.velocity.x = random(-fly.speedX, fly.speedX);
     fly.velocity.y = random(-fly.speedY, fly.speedY);
+    if (fly.x > width) {
+      fly.x -= fly.speedX;
+    }
+
+    if (fly.x < 0) {
+      fly.x += fly.speedX;
+    }
+    if (fly.y > height) {
+      fly.y -= fly.speedY
+    }
+    if (fly.y < 0) {
+      fly.y += fly.speedY;
+    }
+
   }
   fly.x += fly.velocity.x;
   fly.y += fly.velocity.y;
 }
-
+//**the moves seems to be triggered every frame instead of every
+// seconds as stated above for the regular movements that do not. 
+//it jitters when the flies hit the limit of the function flylimits.
 function flyLimits(fly) {
   if (fly.x > width) {
     fly.x -= fly.speedX;
@@ -132,7 +148,7 @@ function flyLimits(fly) {
   if (fly.y > height) {
     fly.y -= fly.speedY
   }
-  if (fly.x < 0) {
+  if (fly.y < 0) {
     fly.y += fly.speedY;
   }
 }
