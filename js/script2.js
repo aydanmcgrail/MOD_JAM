@@ -1,61 +1,69 @@
-/**
- * Frogfrogfrog
- * Pippin Barr
- *
- * A game of catching flies with your frog-tongue
- *
- * Instructions:
- * - Move the frog with your mouse
- * - Click to launch the tongue
- * - Catch flies
- *
- * Made with p5
- * https://p5js.org/
- */
-
 "use strict";
 
 let fly1 = undefined;
 let fly2 = undefined;
 let fly3 = undefined;
+let fly4 = undefined;
 
-// Our frog
+let easing = 0.04;
+let easing2 = 0.8;
+
+let tongueX = 1570;
+let targetX = 1570;
+let min;
+let max;
+let click = 0;
+
+let life = 100; ///will be its hp 0 means the tongue will break.
+let wobbly = 100; //if wobbly= like over 100/extend too far then the tongue will go up and down.
+let moving = false;
+let wobble = 2;
+let wobbleTimer = tongueX; //each amount of set seconds will trigger opposite direction
+let wobbleLoop;
+
 const frog = {
   // The frog's body has a position and size
   body: {
-    x: 320,
-    y: 520,
-    size: 150,
+    x: 1600,
+    y: 400,
+    size: 200,
   },
   // The frog's tongue has a position, size, speed, and state
   tongue: {
-    x: 50,
-    y: 480,
-    size: 20,
-    speed: 20,
+    x: undefined,
+    easeX: undefined,
+    y: 400,
+    size: 80,
+    speed: 10,
+    velocity: 10,
     // Determines how the tongue moves each frame
     state: "idle", // State can be: idle, outbound, inbound
-    solidity: 0, //if value goes to a certain point the tongue breaks.
   },
 };
 
-/**
- * Creates the canvas and initializes the fly
- */
 function setup() {
   createCanvas(1600, 900);
+
+  frameRate(50); // i think a lower framerate will be all around better
+
+  tongueX = 1570;
+  targetX = 1570;
+  min = 50;
+  max = 1580;
 
   fly1 = createFly();
   fly2 = createFly();
   fly3 = createFly();
+  fly4 = createFly();
 }
 
 function createFly() {
   let fly = {
-    x: random(50, 800), // Will be random
-    y: 0,
-    size: 10,
-    speed: random(1, 4),
+    x: random(150, 800),
+    y: random(150, 700),
+    size: 40,
+    speedX: 20,
+    speedY: 10,
   };
   return fly;
 }
@@ -63,97 +71,123 @@ function createFly() {
 function draw() {
   background("#87ceeb");
 
-  //move the flies
+  //checkLife();
+  text(life, width / 4, height / 4);
+  text(wobbleTimer, width / 4.5, height / 4.5);
+
   moveFly(fly1);
   moveFly(fly2);
   moveFly(fly3);
+  moveFly(fly4);
+
+  //move the tongue
+  moveTongue();
+  moveFrog();
+  wobbleTongue();
+
+  keyPressed();
 
   //draw the flies
   drawFly(fly1);
   drawFly(fly2);
   drawFly(fly3);
+  drawFly(fly4);
 
-  moveFrog();
-  moveTongue();
+  //draw the frog
   drawFrog();
-  checkTongueFlyOverlap();
+
+  flyLimits(fly1);
+  flyLimits(fly2);
+  flyLimits(fly3);
+  flyLimits(fly4);
 }
 
-/**
- * Moves the fly according to its speed
- * Resets the fly if it gets all the way to the right
- */
 function moveFly(fly) {
-  // Move the fly
-  fly.y += fly.speed;
-  // Handle the fly going off the canvas
-  if (fly.y > 900) {
-    fly.y = 0;
+  fly.x += random(-fly.speedX, fly.speedX);
+  fly.y += random(-fly.speedY, fly.speedY);
+}
+
+function flyLimits(fly) {
+  if (fly.x > 900) {
+    fly.x -= 20;
+  }
+  if (fly.x < 10) {
+    fly.x += 40;
+  }
+  if (fly.y > 790) {
+    fly.y -= 40;
+  }
+  if (fly.x < 20) {
+    fly.y += 40;
   }
 }
 
-/**
- * Draws the fly as a black circle
- */
 function drawFly(fly) {
   push();
   noStroke();
-  fill("#000000");
-  ellipse(fly.x, fly.y, fly.size);
+  fill(255);
+  rect(fly.x, fly.y, fly.size);
   pop();
 }
 
-/**
- * Moves the frog to the mouse position on x
- */
-function moveFrog() {
-  frog.body.x = mouseX;
-}
-
-/**
- * Handles moving the tongue based on its state
- */
 function moveTongue() {
-  // Tongue matches the frog's x
-  frog.tongue.x = frog.body.x;
-  // If the tongue is idle, it doesn't do anything
-  if (frog.tongue.state === "idle") {
-    // Do nothing
-  }
-  // If the tongue is outbound, it moves up
-  else if (frog.tongue.state === "outbound") {
-    frog.tongue.y += -frog.tongue.speed;
-    // The tongue bounces back if it hits the top
-    if (frog.tongue.y <= 0) {
-      frog.tongue.state = "inbound";
+  if (keyIsPressed) {
+    if (keyCode === 65) {
+      targetX -= 5;
+    } else if (keyCode === 68) {
+      targetX += 5;
     }
   }
-  // If the tongue is inbound, it moves down
-  else if (frog.tongue.state === "inbound") {
-    frog.tongue.y += frog.tongue.speed;
-    // The tongue stops if it hits the bottom
-    if (frog.tongue.y >= height) {
-      frog.tongue.state = "idle";
-    }
-  }
+  targetX = targetX + 2;
+  targetX = constrain(targetX, min, max);
+
+  tongueX += (targetX - tongueX) * easing;
+  text(tongueX, width / 4.75, height / 4.75);
 }
 
-/**
- * Displays the tongue (tip and line connection) and the frog (body)
- */
+function wobbleTongue() {
+  frog.tongue.y = frog.body.y;
+  //frog.tongue.y = frog.body.y;
+  //trigger an event when the tongue is extended too far
+  if (tongueX <= 1300) {
+    life -= 0.025; //this make somwehat of a second (minus one second)
+    moving = !moving; //the tongue is now not not moving
+    wobbleTimer += 0.025; //right now this does nothing.
+  } else {
+    wobbleTimer = 0;
+  }
+
+  if (moving) {
+    //the tongue is moving each frame that it exceeds the limit above
+    frog.tongue.y += wobble * easing2; //it starts by going down ADDIDITON
+  }
+
+  wobble = (width - tongueX) / 150; //important to put paranthesis i forgot it is math an priorities...
+  //this creates a value at around 0.02 to 10
+  //otherwise without the div it goes way to down cause it ranges between 20 and 1600.
+  text(wobble, width / 4.75, height / 5.2);
+}
+
+function moveFrog() {
+  //frog.body.y = mouseY;
+  let targetY = mouseY;
+  let dx = targetY - frog.body.y;
+  frog.body.y += dx * easing;
+}
+
 function drawFrog() {
   // Draw the tongue tip
   push();
-  fill("#ff0000");
+  fill("#6e6666ff");
   noStroke();
-  ellipse(frog.tongue.x, frog.tongue.y, frog.tongue.size);
+  ellipse(tongueX, frog.tongue.y, frog.tongue.size);
   pop();
 
   // Draw the rest of the tongue
   push();
-  stroke("#ff0000");
+  stroke("#6e6666ff");
   strokeWeight(frog.tongue.size);
-  line(frog.tongue.x, frog.tongue.y, frog.body.x, frog.body.y);
+  line(tongueX, frog.tongue.y, frog.body.x, frog.body.y);
   pop();
 
   // Draw the frog's body
@@ -167,24 +201,22 @@ function drawFrog() {
 /**
  * Handles the tongue overlapping the fly
  */
-function checkTongueFlyOverlap() {
+function checkTongueFlyOverlap(frog, fly) {
   // Get distance from tongue to fly
-  const d = dist(frog.tongue.x, frog.tongue.y, fly.x, fly.y);
+  const d = dist(tongueX, frog.tongue.y, fly.x, fly.y);
   // Check if it's an overlap
   const eaten = d < frog.tongue.size / 2 + fly.size / 2;
   if (eaten) {
     // Reset the fly
-    fly.y = 0;
+    fly.y -= 100;
     // Bring back the tongue
     frog.tongue.state = "inbound";
   }
 }
 
-/**
- * Launch the tongue on click (if it's not launched yet)
- */
-function mousePressed() {
-  if (frog.tongue.state === "idle") {
-    frog.tongue.state = "outbound";
+function keyPressed() {
+  // Prevent default browser behavior for arrow keys
+  if (keyCode === 65 || keyCode === 68) {
+    return false;
   }
 }
