@@ -42,16 +42,21 @@ const frog = {
 
 let img1;
 let img2;
+let img3;
+let img4;
 let opacity1 = 0; //i will up the value so img1 will become visible
 let opacity2 = 255; // i will lower the value so img1 will become transparent
+let opacity3 = 255;
 
 function preload() {
   img1 = loadImage("./assets/images/frog.png");
   img2 = loadImage("./assets/images/frogidle.png");
+  img3 = loadImage("./assets/images/floor.png");
+  img4 = loadImage("./assets/images/mouche.png");
 }
 
 function setup() {
-  createCanvas(1600, 900);
+  createCanvas(1600, 1000);
 
   tongueX = 1500;
   targetX = 1500;
@@ -72,7 +77,7 @@ function createFly() {
   let fly = {
     x: random(150, 800),
     y: random(150, 700),
-    size: 20,
+    size: 60,
     speedX: 4,
     speedY: 4,
     velocity: { x: 0, y: 0 },
@@ -82,6 +87,8 @@ function createFly() {
 
 function draw() {
   background("#87ceeb");
+
+  image(img3, 0, 0);
 
   //checkLife();
   text(life, width / 4, height / 4);
@@ -115,6 +122,11 @@ function draw() {
   flyLimits(fly2);
   flyLimits(fly3);
   flyLimits(fly4);
+
+  push();
+  fill(0);
+  rect(0, 900, 1600, 100);
+  pop();
 }
 
 function resetFly() {
@@ -126,17 +138,18 @@ function moveFly(fly) {
   if (frameCount % 50 === 0) {
     fly.velocity.x = random(-fly.speedX, fly.speedX);
     fly.velocity.y = random(-fly.speedY, fly.speedY);
-    if (fly.x > width) {
+    if (fly.x > 1300) {
+      //here i do not want flies to get too close to frog
       fly.x -= fly.speedX;
     }
 
-    if (fly.x < 0) {
+    if (fly.x < 100) {
       fly.x += fly.speedX;
     }
-    if (fly.y > height) {
+    if (fly.y > 800) {
       fly.y -= fly.speedY;
     }
-    if (fly.y < 0) {
+    if (fly.y < 100) {
       fly.y += fly.speedY;
     }
   }
@@ -168,6 +181,8 @@ function drawFly(fly) {
   fill(255);
   rectMode(CENTER);
   rect(fly.x, fly.y, fly.size);
+  tint(255, opacity3);
+  image(img4, fly.x - 50, fly.y - 50);
   pop();
 }
 
@@ -290,13 +305,20 @@ function drawFrogIdle() {
  */
 function checkTongueFlyOverlap() {
   // Get distance from tongue to fly
-  const d = dist(frog.tongue.x, frog.tongue.y, fly.x, fly.y);
+  const d = dist(tongueX, frog.tongue.y, fly.x, fly.y);
   // Check if it's an overlap
-  const eaten = d < frog.tongue.size / 2 + fly.size / 2;
-  if (eaten) {
+  const hit = d < frog.tongue.size / 2 + fly.size / 2;
+  if (hit) {
     // Reset the fly
     resetFly();
     // Bring back the tongue
     frog.tongue.state = "inbound";
+
+    ///IF mouche is hit THEN it gets minus on to its value, if hit again
+    // then minus one again.   when it gets to zero,
+    //zero equals destroys mouche does not come back
+    //(opacity = 0?) or they are removed? do not know how to do that.
+
+    //you win
   }
 }
