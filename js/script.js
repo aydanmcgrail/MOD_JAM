@@ -5,9 +5,13 @@ let fly2 = undefined;
 let fly3 = undefined;
 let fly4 = undefined;
 
+let flyState = [0, 2, 3];
+let death = flyState[0];
+let flyHit = true;
+
 //this is for the easing
-let tongueX = 1500;
-let targetX = 1500;
+let tongueX = 1450;
+let targetX = 1450;
 let min;
 let max;
 
@@ -18,14 +22,16 @@ let life = 100; ///will be its hp 0 means the tongue will break. GAME OVER
 
 let wobble = 1;
 let wobbleTimer = 0; //each amount of set seconds will trigger opposite direction
-let wobbleLoop;
+let wobbleLoop = 100;
 
 const frog = {
   // The frog's body has a position and size
   body: {
-    x: 1500,
+    x: 1450,
     y: 400,
     size: 1,
+    minY: 100,
+    maxY: 730,
   },
   // The frog's tongue has a position, size, speed, and state
   tongue: {
@@ -44,24 +50,27 @@ let img1;
 let img2;
 let img3;
 let img4;
-let opacity1 = 0; //i will up the value so img1 will become visible
-let opacity2 = 255; // i will lower the value so img1 will become transparent
-let opacity3 = 255;
+let img5;
+let opacityImg1 = 0; //i will up the value so img1 will become visible
+let opacityImg2 = 255; // i will lower the value so img1 will become transparent
+let opacityImg5 = 255;
+let opacityFly = 255;
 
 function preload() {
   img1 = loadImage("./assets/images/frog.png");
   img2 = loadImage("./assets/images/frogidle.png");
   img3 = loadImage("./assets/images/floor.png");
   img4 = loadImage("./assets/images/mouche.png");
+  img5 = loadImage("./assets/images/frogstone.png");
 }
 
 function setup() {
   createCanvas(1600, 1000);
 
-  tongueX = 1500;
-  targetX = 1500;
+  tongueX = 1450;
+  targetX = 1450;
   min = 50;
-  max = 1500;
+  max = 1450;
 
   angleMode(DEGREES);
 
@@ -77,7 +86,7 @@ function createFly() {
   let fly = {
     x: random(150, 800),
     y: random(150, 700),
-    size: 60,
+    size: 75,
     speedX: 4,
     speedY: 4,
     velocity: { x: 0, y: 0 },
@@ -93,8 +102,8 @@ function draw() {
   //checkLife();
   text(life, width / 4, height / 4);
   text(wobbleTimer, width / 4.5, height / 4.5);
-  text(wobbleLoop, width / 4.75, height / 4.75);
-  text(opacity2, width / 2.75, height / 2.75);
+  text(flyHit, width / 6, height / 3);
+  text(opacityImg2, width / 2.75, height / 2.75);
 
   moveFly(fly1);
   moveFly(fly2);
@@ -118,61 +127,27 @@ function draw() {
   drawFly(fly3);
   drawFly(fly4);
 
-  flyLimits(fly1);
-  flyLimits(fly2);
-  flyLimits(fly3);
-  flyLimits(fly4);
-
   push();
   fill(0);
   rect(0, 900, 1600, 100);
   pop();
 }
 
-function resetFly() {
-  fly.x;
-  fly.y;
-}
-
 function moveFly(fly) {
   if (frameCount % 50 === 0) {
     fly.velocity.x = random(-fly.speedX, fly.speedX);
     fly.velocity.y = random(-fly.speedY, fly.speedY);
-    if (fly.x > 1300) {
-      //here i do not want flies to get too close to frog
-      fly.x -= fly.speedX;
-    }
-
-    if (fly.x < 100) {
-      fly.x += fly.speedX;
-    }
-    if (fly.y > 800) {
-      fly.y -= fly.speedY;
-    }
-    if (fly.y < 100) {
-      fly.y += fly.speedY;
-    }
   }
+  //here i do not want flies to get too close to frog
+  if (fly.x > 1300 || fly.x < 100) {
+    fly.velocity.x = fly.velocity.x * -1;
+  }
+  if (fly.y > 800 || fly.y < 100) {
+    fly.velocity.y = fly.velocity.y * -1;
+  }
+
   fly.x += fly.velocity.x;
   fly.y += fly.velocity.y;
-}
-//**the moves seems to be triggered every frame instead of every
-// seconds as stated above for the regular movements that do not.
-//it jitters when the flies hit the limit of the function flylimits.
-function flyLimits(fly) {
-  if (fly.x > width) {
-    fly.x -= fly.speedX;
-  }
-
-  if (fly.x < 0) {
-    fly.x += fly.speedX;
-  }
-  if (fly.y > height) {
-    fly.y -= fly.speedY;
-  }
-  if (fly.y < 0) {
-    fly.y += fly.speedY;
-  }
 }
 
 function drawFly(fly) {
@@ -181,8 +156,8 @@ function drawFly(fly) {
   fill(255);
   rectMode(CENTER);
   rect(fly.x, fly.y, fly.size);
-  tint(255, opacity3);
-  image(img4, fly.x - 50, fly.y - 50);
+  tint(255, opacityFly);
+  image(img4, fly.x - 75, fly.y - 75);
   pop();
 }
 
@@ -219,13 +194,15 @@ function wobbleTongue() {
   }
 
   //trigger a new image when the tongue is resting at the base position.(x=1500px)
-  if (tongueX <= 1475) {
+  if (tongueX <= 1440) {
     //close to rest position,0 tongue extension (1500px) && img1 is showing(true)
-    opacity2 -= 25;
-    opacity1 = 255;
+    opacityImg2 -= 25;
+    opacityImg1 = 255;
+    opacityImg5 = 0;
   } else {
-    opacity2 = 255;
-    opacity1 = 0;
+    opacityImg2 = 255;
+    opacityImg1 = 0;
+    opacityImg5 = 0;
     //img1.hide();
     // img2.show();
   }
@@ -255,14 +232,14 @@ function wobbleTongue() {
 
   // Draw the tongue tip
   push();
-  fill("#7e4c4cff");
+  fill("#79484eff");
   noStroke();
   ellipse(tongueX, frog.tongue.y + offset, frog.tongue.size);
   pop();
 
   // Draw the rest of the tongue
   push();
-  stroke("#7e4c4cff");
+  stroke("#79484eff");
   strokeWeight(frog.tongue.size);
   line(tongueX, frog.tongue.y + offset, frog.body.x, frog.body.y);
   pop();
@@ -273,6 +250,7 @@ function moveFrog() {
   let targetY = mouseY;
   let dx = targetY - frog.body.y;
   frog.body.y += dx * easing2;
+  frog.body.y = constrain(frog.body.y, frog.body.minY, frog.body.maxY);
 }
 
 function drawFrog() {
@@ -288,15 +266,22 @@ function drawFrog() {
 
 function drawFrogOpen() {
   push();
-  tint(255, opacity1);
-  image(img1, frog.body.x - 170, frog.body.y - 130);
+  tint(255, opacityImg1);
+  image(img1, frog.body.x - 155, frog.body.y - 120);
   pop(); //not even sure i need to push and pop
 }
 
 function drawFrogIdle() {
   push();
-  tint(255, opacity2);
-  image(img2, frog.body.x - 170, frog.body.y - 130);
+  tint(255, opacityImg2);
+  image(img2, frog.body.x - 155, frog.body.y - 120);
+  pop(); //not even sure i need to push and pop
+}
+
+function drawFrogStoned() {
+  push();
+  tint(255, opacityImg5);
+  image(img5, frog.body.x - 155, frog.body.y - 120);
   pop(); //not even sure i need to push and pop
 }
 
@@ -309,16 +294,11 @@ function checkTongueFlyOverlap() {
   // Check if it's an overlap
   const hit = d < frog.tongue.size / 2 + fly.size / 2;
   if (hit) {
-    // Reset the fly
-    resetFly();
-    // Bring back the tongue
-    frog.tongue.state = "inbound";
-
+    // no Resetting the fly
     ///IF mouche is hit THEN it gets minus on to its value, if hit again
     // then minus one again.   when it gets to zero,
     //zero equals destroys mouche does not come back
     //(opacity = 0?) or they are removed? do not know how to do that.
-
     //you win
   }
 }
