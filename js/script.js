@@ -5,6 +5,8 @@ let fly2 = undefined;
 let fly3 = undefined;
 let fly4 = undefined;
 
+let colorGreen = "#00ff00";
+let colorRed = "#ff0000";
 let flyState = [0, 2, 3];
 let death = flyState[0];
 let flyHit = true; //flyState[1];
@@ -91,6 +93,9 @@ function createFly() {
     speedX: 3,
     speedY: 3,
     velocity: { x: 0, y: 0 },
+    squareRight: "#00ff00",
+    squareCenter: "#00ff00",
+    squareLeft: "#00ff00",
   };
   return fly;
 }
@@ -164,6 +169,22 @@ function drawFly(fly) {
   ellipse(fly.x, fly.y, fly.size);
   tint(255, opacityFly);
   image(img4, fly.x - 90, fly.y - 100);
+
+  push();
+  fill(fly.squareRight);
+  rect(fly.x + 20, fly.y - 110, 15);
+  pop();
+
+  push();
+  fill(fly.squareCenter);
+  rect(fly.x, fly.y - 110, 15);
+  pop();
+
+  push();
+  fill(fly.squareLeft);
+  rect(fly.x - 20, fly.y - 110, 15);
+  pop();
+
   pop();
 }
 
@@ -300,7 +321,7 @@ function checkOverlap(frog, fly) {
   // Check if it's an overlap
   const hit = d < frog.tongue.size / 2 + fly.size / 2;
   if (hit) {
-    fill("#46ca79ff");
+    fly.squareRight = "#ff0000";
     flyHit = false;
     fly.velocity.x = -4.5;
   } else flyHit = true;
