@@ -7,7 +7,8 @@ let fly4 = undefined;
 
 let flyState = [0, 2, 3];
 let death = flyState[0];
-let flyHit = true;
+let flyHit = true; //flyState[1];
+let flyAlive = flyState[2];
 
 //this is for the easing
 let tongueX = 1450;
@@ -15,8 +16,8 @@ let targetX = 1450;
 let min;
 let max;
 
-let easing = 0.008;
-let easing2 = 0.002;
+let easing = 0.01;
+let easing2 = 0.004;
 
 let life = 100; ///will be its hp 0 means the tongue will break. GAME OVER
 
@@ -86,9 +87,9 @@ function createFly() {
   let fly = {
     x: random(150, 800),
     y: random(150, 700),
-    size: 75,
-    speedX: 4,
-    speedY: 4,
+    size: 100,
+    speedX: 3,
+    speedY: 3,
     velocity: { x: 0, y: 0 },
   };
   return fly;
@@ -127,6 +128,11 @@ function draw() {
   drawFly(fly3);
   drawFly(fly4);
 
+  checkOverlap(frog, fly1);
+  checkOverlap(frog, fly2);
+  checkOverlap(frog, fly3);
+  checkOverlap(frog, fly4);
+
   push();
   fill(0);
   rect(0, 900, 1600, 100);
@@ -155,9 +161,9 @@ function drawFly(fly) {
   noStroke();
   fill(255);
   rectMode(CENTER);
-  rect(fly.x, fly.y, fly.size);
+  ellipse(fly.x, fly.y, fly.size);
   tint(255, opacityFly);
-  image(img4, fly.x - 75, fly.y - 75);
+  image(img4, fly.x - 90, fly.y - 100);
   pop();
 }
 
@@ -288,17 +294,14 @@ function drawFrogStoned() {
 /**
  * Handles the tongue overlapping the fly
  */
-function checkTongueFlyOverlap() {
+function checkOverlap(frog, fly) {
   // Get distance from tongue to fly
   const d = dist(tongueX, frog.tongue.y, fly.x, fly.y);
   // Check if it's an overlap
   const hit = d < frog.tongue.size / 2 + fly.size / 2;
   if (hit) {
-    // no Resetting the fly
-    ///IF mouche is hit THEN it gets minus on to its value, if hit again
-    // then minus one again.   when it gets to zero,
-    //zero equals destroys mouche does not come back
-    //(opacity = 0?) or they are removed? do not know how to do that.
-    //you win
-  }
+    fill("#46ca79ff");
+    flyHit = false;
+    fly.velocity.x = -4.5;
+  } else flyHit = true;
 }
