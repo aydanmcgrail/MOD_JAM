@@ -1,35 +1,42 @@
-# TITLE OF PROJECT
+# DUNGEON FROG
 
-AUTHOR NAME
+AYDAN MC GRAIL
 
 [View this project online](URL_FOR_THE_RUNNING_PROJECT)
 
 ## Description
 
-This description should help the reader understand what the program is, anything they should know to be able to experience it (controls, special features, etc.), and what the desired user experience is. For example:
+In a dark dungeon a frog is trying to clean his room by getting rid of the flies. The frog is afflicted with a curse. If he moves too much, he will turn into stone. He can also transmit his curse to others. Through enough friction by contact, the frog can turn the flies into stones.
 
-> *The Mayor of Clown Town* is a simulator experience that allows the user to control a small town populated entirely by clowns.
+> In this game, extend the tongue by repeatedly pressing A. Repeatedly pressing B key will to pull it back. 
 
-> The experience is controlled via the mouse, with left click selecting a clown and bringing up a menu of options such as "slip of banana peel" or "get into impossible capacious clown-car."
+> You can change the frog's height with the mouse (mouseY), 
 
-> The project is meant to give the user a sense of what it would be the mayor of a town of clowns, eventually getting the sense that clowns are not taking their civic duties seriously.
+> The frog looses life points progressively when the tongue is extended. The amount of life points lost is tied to the length of the extention. 
+
 
 ## Screenshot(s)
 
-This bit should have some images of the program running so that the reader has a sense of what it looks like. For example:
+Here is what the game looks like. 
 
-> ![Image of a clown face](./assets/images/clown.png)
+> ![Image of the game](./assets/images/gameimage.jpg)
+
+here is an image of the frog and a fly.
+
+> ![The frog](./assets/images/frog.png)
+
+> ![A fly](./assets/images/mouche.png)
+
 
 ## Attribution
 
 This bit should attribute any code, assets or other elements used taken from other sources. For example:
 
 > - This project uses [p5.js](https://p5js.org).
-> - The clown image is a capture of the clown from the Apple emoji character set.
-> - The barking sound effect is "single dog bark 1" by crazymonke9 from freesound.org: https://freesound.org/people/crazymonke9/sounds/418107/
+> - Artworks made by me.
+
 
 ## License
 
-This bit should include the license you want to apply to your work. For example:
 
 > This project is licensed under a Creative Commons Attribution ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.en)) license with the exception of libraries and other components with their own licenses.

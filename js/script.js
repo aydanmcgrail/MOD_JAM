@@ -17,12 +17,13 @@ let colorGreen = "#00ff00";
 let colorRed = "#ff0000";
 
 let life = 100;
+let lifeMoving = false;
 let minLife = 0;
 let maxLife = 100;
 let gameOverY = -10;
 let minLifeY = -500;
 let maxLifeY = 550;
-let tongueSecurity;
+let tongueSecurity = 0;
 
 //this is for the easing and the tongue moving
 let tongueX = 1450;
@@ -30,7 +31,10 @@ let targetX = 1450;
 let min;
 let max;
 let easing = 0.01;
-let easing2 = 0.004;
+let easing2 = 0.008;
+let easing2Min = 0.001;
+let easing2Max = 0.008;
+let easing2Penality = 0;
 
 /////////////////////the effects the tongue is subject to//////////////////////
 /////////////////////the effects the tongue is subject to//////////////////////
@@ -57,8 +61,14 @@ const frog = {
     velocity: 10,
     tongueHitFly: false, // State can be: idle, outbound, inbound
     angle: 0, //for the sine wave
-    fill: { r: 150, g: 200, b: 60 },
-  },
+    fill: { r: 128, g: 72, b: 80 },
+    maxR: 122,
+    minR: 128,
+    maxG: 122,
+    minG: 72,
+    maxB: 122,
+    minB: 80,
+  }
 };
 
 ///////////////////////////////////images and sounds//////////////////////////////
@@ -76,8 +86,9 @@ let img8;
 let opacityImg1 = 0; //i will up the value so img1 will become visible
 let opacityImg2 = 255; // i will lower the value so img1 will become transparent
 let opacityImg5 = 255;
-let opacityStone = 255; //this will be put on both images of frog and they will
-//gradually disappear to show the stone version underneath.
+let opacitybackground = 0; //when game over the screen will blacken.
+let maxBlacken = 175;
+let minBlacken = 0;
 
 function preload() {
   img1 = loadImage("./assets/images/frog.png");
@@ -166,6 +177,11 @@ function draw() {
   checkOverlap(frog, fly4);
 
   push();
+  fill(0, 0, 0, opacitybackground);
+  rect(800, 400, 1600, 1000);
+  pop();
+
+  push();
   image(img6, 0, 853);
   pop();
 
@@ -219,8 +235,8 @@ function drawFly(fly) {
   image(img4, fly.x - 90, fly.y - 100);
   pop();
 
-  textSize(24);
-  text(fly.flyHit, fly.x + 110, fly.y + 130);
+  /*textSize(24);
+  text(fly.flyHit, fly.x + 110, fly.y + 130);*/
 
   push();
   fill(fly.squareRight);
@@ -244,18 +260,24 @@ function moveTongue() {
 
   //targetX = mouseX;  ////for moving faster with mouse
 
-  if (keyIsPressed) {
-    if (keyCode === 65) {
-      targetX -= 5;
-    } else if (keyCode === 68) {
-      targetX += 5;
+  if (life <= 0) {
+    targetX;
+    tongueX;
+  } else {
+    if (keyIsPressed) {
+      if (keyCode === 65) {
+        targetX -= 5;
+      } else if (keyCode === 68) {
+        targetX += 5;
+      }
     }
+
+    targetX = targetX + 2;
+    targetX = constrain(targetX, min, max);
+
+    tongueX += (targetX - tongueX) * easing;
   }
 
-  targetX = targetX + 2;
-  targetX = constrain(targetX, min, max);
-
-  tongueX += (targetX - tongueX) * easing;
 }
 
 function checkLife() {
@@ -264,7 +286,7 @@ function checkLife() {
   textStyle(BOLD);
   textFont("Courier New");
   fill(colorGreen);
-  text(life, 1496, 948); ///life=100,will be its hp 0 means the tongue will break. GAME OVER
+  text(life.toFixed(0), 1498, 948); ///life=100,will be its hp 0 means the tongue will break. GAME OVER
   fill(colorRed);
   textSize(275);
   stroke(0);
@@ -275,29 +297,44 @@ function checkLife() {
 
   life = constrain(life, minLife, maxLife);
 
-  textSize(32);
+  if (lifeMoving === true) {
+    life -= tongueSecurity;
+  }
+  tongueSecurity = (1590 - tongueX) / 15000;
+  easing2Penality = (100 - life) / 10000000;
+
+  /*textSize(32);
   text(tongueX, 200, 100);
+  text(tongueSecurity, 200, 200);
+  text(easing2Penality, 200, 300);
+  text(easing2, 200, 400);*/
+
 
   //tongueX = tongueSecurity;
 
   if (life <= 0) {
     gameOverY += 1;
+    opacitybackground += 0.5;
   } else {
     gameOverY;
+    opacitybackground;
   }
+  opacitybackground = constrain(opacitybackground, minBlacken, maxBlacken);
   gameOverY = constrain(gameOverY, minLifeY, maxLifeY);
 }
 
 function wobbleTongue() {
   //trigger an event when the tongue is extended too far
   if (tongueX <= 1300) {
-    life -= 0.25; //this make somwehat of a second (minus one second)
-  } else if (tongueX <= 600) {
-    life -= 0.5;
+    life -= 0.0008; //this make somwehat of a second (minus one second)
+    lifeMoving = true;
   } else {
-    frog.tongue.y = frog.body.y;
+    lifeMoving = false;
   }
 
+  if (tongueX >= 1400) {
+    life += 0.05;
+  }
   //trigger a new image when the tongue is resting at the base position.(x=1500px)
   if (tongueX <= 1440) {
     //close to rest position,0 tongue extension (1500px) && img1 is showing(true)
@@ -307,6 +344,7 @@ function wobbleTongue() {
     opacityImg2 = 255;
     opacityImg1 = 0;
   }
+
   if (life <= 0) {
     opacityImg2 = 0;
     opacityImg1 = 0;
@@ -336,14 +374,14 @@ function wobbleTongue() {
 
   // Draw the tongue tip
   push();
-  fill(frog.tongue.fill);
+  fill(frog.tongue.fill.r, frog.tongue.fill.g, frog.tongue.fill.b);
   noStroke();
   ellipse(tongueX, frog.tongue.y + offset, frog.tongue.size);
   pop();
 
   // Draw the rest of the tongue
   push();
-  stroke(frog.tongue.fill);
+  stroke(frog.tongue.fill.r, frog.tongue.fill.g, frog.tongue.fill.b);
   strokeWeight(frog.tongue.size);
   line(tongueX, frog.tongue.y + offset, frog.body.x, frog.body.y);
   pop();
@@ -354,11 +392,25 @@ function moveFrog() {
 
   if (life <= 0) {
     frog.body.y;
+    frog.tongue.fill.r = 122;
+    frog.tongue.fill.g = 122;
+    frog.tongue.fill.b = 122;
   } else {
     let targetY = mouseY;
     let dx = targetY - frog.body.y;
+
+    easing2 -= easing2Penality;
+    easing2 = constrain(easing2, easing2Min, easing2Max);
+
     frog.body.y += dx * easing2;
+
     frog.body.y = constrain(frog.body.y, frog.body.minY, frog.body.maxY);
+    frog.tongue.fill.r;
+    frog.tongue.fill.g;
+    frog.tongue.fill.b;
+  }
+  if (life >= 95) {
+    easing2 += 0.0002;
   }
 }
 
