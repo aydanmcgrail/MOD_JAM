@@ -14,12 +14,13 @@ In a dark dungeon a frog is trying to clean his room by getting rid of the flies
 
 > The frog looses life points progressively when the tongue is extended. The amount of life points lost is tied to the length of the extention. 
 
+>The more the tongue tip is overlapping one fly, the fly will loose one of his life points. When a certain fly as lost its 3 life points, it turns into stone. while a live fly will move away easily from the tongue tip, a stone fly will prevent the tongue tip to reach past it. The stone fly now acts as a blocking tool for the other live flies. 
 
 ## Screenshot(s)
 
 Here is what the game looks like. 
 
-> ![Image of the game](./assets/images/gameimage.jpg)
+> ![Image of the game](./assets/images/gameimage.png)
 
 here is an image of the frog and a fly.
 
@@ -29,8 +30,6 @@ here is an image of the frog and a fly.
 
 
 ## Attribution
-
-This bit should attribute any code, assets or other elements used taken from other sources. For example:
 
 > - This project uses [p5.js](https://p5js.org).
 > - Artworks made by me.
