@@ -235,8 +235,8 @@ function drawFly(fly) {
   image(img4, fly.x - 90, fly.y - 100);
   pop();
 
-  /*textSize(24);
-  text(fly.flyHit, fly.x + 110, fly.y + 130);*/
+  textSize(24);
+  text(fly.flyHit, fly.x + 110, fly.y + 130);
 
   push();
   fill(fly.squareRight);
@@ -303,11 +303,11 @@ function checkLife() {
   tongueSecurity = (1590 - tongueX) / 15000;
   easing2Penality = (100 - life) / 10000000;
 
-  /*textSize(32);
+  textSize(32);
   text(tongueX, 200, 100);
   text(tongueSecurity, 200, 200);
   text(easing2Penality, 200, 300);
-  text(easing2, 200, 400);*/
+  text(easing2, 200, 400);
 
 
   //tongueX = tongueSecurity;
